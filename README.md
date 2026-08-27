@@ -14,6 +14,25 @@ This project demonstrates the manual construction of a foundational AWS networki
     * Configured a **Security Group** (stateful) to allow inbound HTTP (Port 80) and restricted SSH (Port 22) access at the instance level.
 * **Elastic Compute Cloud (EC2):** Launched an Amazon Linux 2023 instance deployed directly into the custom public subnet.
 
+```mermaid
+flowchart LR
+    Internet((Internet)) <--> IGW[Internet Gateway]
+    
+    subgraph VPC [MyCustomVPC: 10.0.0.0/16]
+        IGW
+        subgraph Subnet [PublicSubnet-1: 10.0.1.0/24]
+            RT[Route Table]
+            
+            subgraph SG [Security Group: Ports 80 & 22]
+                EC2[EC2 Instance: Apache Web Server]
+            end
+        end
+    end
+
+    IGW <--> RT
+    RT <--> EC2
+```
+
 ## 🚀 Deployment Steps
 
 **1. Network Foundation**
@@ -28,7 +47,11 @@ Passed the following script into the EC2 User Data to automatically install, sta
     systemctl start httpd
     echo '<html><h1>Hello From Your Web Server!</h1></html>' > /var/www/html/index.html
 
-**3. Infrastructure Scaling & Lifecycle Management**
-* **Termination Protection:** Enabled safeguards against accidental instance deletion.
-* **Vertical Scaling:** Stopped the instance to upgrade the instance type from `t3.micro` to `t3.small` to double memory capacity.
+**3. Monitoring & Instance Validation**
+* Verified system and instance reachability status checks via the AWS console.
+* Tested web browser accessibility using the EC2 instance's public IPv4 address over HTTP (Port 80). 
+
+**4. Infrastructure Scaling & Lifecycle Management**
+* **Termination Protection:** Enabled safeguards against accidental instance deletion and tested the block.
+* **Vertical Scaling:** Stopped the instance to upgrade the instance type from `t3.micro` to `t3.small` to double available compute memory, and restarted.
 * **Storage Expansion:** Dynamically expanded the root EBS volume from 8 GiB to 10 GiB.
